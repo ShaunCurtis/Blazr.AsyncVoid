@@ -32,8 +32,11 @@ Welcome to your new app.
         _timer.Elapsed += this.OnTimerElapsed;
     }
 
-    protected void Start()
-        => _timer.Enabled = true;
+    protected Task Start()
+    {
+        _timer.Enabled = true;
+        return Task.CompletedTask;
+    }
 
     // This invokes the handler on the UI Dispatcher context
     // and passes the task to the Await extension method on Task

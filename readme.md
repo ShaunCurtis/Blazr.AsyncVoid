@@ -50,8 +50,11 @@ And then a page that refreshes:
         _timer.Elapsed += this.OnTimerElapsed;
     }
 
-    protected void Start()
-        => _timer.Enabled = true;
+    protected Task Start()
+    {
+        _timer.Enabled = true;
+        return Task.CompletedTask;
+    }
 
     // This invokes the handler on the UI Dispatcher context
     // and passes the task to the Await extension method on Task
@@ -167,8 +170,11 @@ Welcome to your new app.
         _timer.Elapsed += this.OnTimerElapsed;
     }
 
-    protected void Start()
-        => _timer.Enabled = true;
+    protected Task Start()
+    {
+        _timer.Enabled = true;
+        return Task.CompletedTask;
+    }
 
     private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
         => this.InvokeAsync(this.RefreshData).Await(null, this.HandleError);
@@ -191,6 +197,29 @@ Welcome to your new app.
         => _timer.Elapsed -= this.OnTimerElapsed;
 }
 ```
+
+## UI Events
+
+It's common to see:
+
+```csharp
+    protected void Start()
+        => _timer.Enabled = true;
+```
+
+Which is perfectly acceptable for the circumstances.  Setting the timer to true is synchronous code.  The code block runs to completion with no yielding.  Returning a `void` doesan't matter because all the code has executed.
+
+However, as a beginner or intermediate Blazor programmer, stick with this for all UI event handlers.
+
+```csharp
+    protected Task Start()
+    {
+        _timer.Enabled = true;
+        return Task.CompletedTask;
+    }
+```
+
+Why?  You'll never fall into the trap of adding an await to the method and Visual Studio setting up the handler as `async void`.
 
 ## Service Loading
 
