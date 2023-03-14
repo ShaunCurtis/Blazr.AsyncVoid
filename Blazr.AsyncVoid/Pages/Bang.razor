@@ -1,0 +1,45 @@
+﻿@page "/bang"
+@inject WeatherForecastService Service
+@using System.Timers
+@implements IDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Blazor goes Bang!</h1>
+
+<div class="m-2">
+    <button disabled="@_timer.Enabled" class="btn btn-success" @onclick=this.Start>Kill Me</button>
+</div>
+
+<div class="alert alert-info">
+    @this.Message
+</div>
+
+@code {
+    private System.Timers.Timer _timer = new System.Timers.Timer(2000);
+    private string? Message;
+
+    protected override void OnInitialized()
+    {
+        _timer.AutoReset = true;
+        _timer.Elapsed += this.OnTimerElapsed;
+    }
+
+    protected void Start()
+        => _timer.Enabled = true;
+
+    // This invokes the handler on the UI Dispatcher context
+    // and passes the task to the Await extension method on Task
+    private async void OnTimerElapsed(object? sender, ElapsedEventArgs e)
+        => await this.RefreshData();
+
+    private async Task RefreshData()
+    {
+        this.Message = DateTime.Now.ToLongTimeString();
+        await this.Service.GetException(null);
+        await this.InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+        => _timer.Elapsed -= this.OnTimerElapsed;
+}
